@@ -21,10 +21,11 @@ function runGenSmallGraph() {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  // Parse the Data
+  // Parse the Data and plot
   d3.csv(
     "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
   ).then(function (data) {
+    //TODO Instead of aggregate small %, should aggregate smallest percentages until have only 6 categories.
     //need to aggregate small % into Other
     for (let i = 0; i < data.length; i++) {
       obj = data[i];
@@ -46,6 +47,7 @@ function runGenSmallGraph() {
     let subgroups = data.columns.slice(1);
 
     // X axis groups
+    //TODO parameterize group key...
     let groups = d3.map(data, function (d) {
       return d.Month;
     });
