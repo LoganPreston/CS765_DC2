@@ -1,6 +1,7 @@
 function runGenSmallGraph() {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
+
   // set the dimensions and margins of the graph
   let margin = { top: 10, right: 250, bottom: 50, left: 250 },
     width = 128,
@@ -12,14 +13,9 @@ function runGenSmallGraph() {
     .append("div")
     .attr("class", "hover")
     .style("opacity", 0);
+
   // append the svg object to the body of the page
-  let svg = d3
-    .select("#graph")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  let svg = setupSVG(margin, width, height);
 
   // Parse the Data and plot
   d3.csv(
@@ -27,30 +23,13 @@ function runGenSmallGraph() {
   ).then(function (data) {
     //TODO Instead of aggregate small %, should aggregate smallest percentages until have only 6 categories.
     //need to aggregate small % into Other
-    for (let i = 0; i < data.length; i++) {
-      obj = data[i];
-      obj["Other"] = Number(obj["Other"]);
-
-      //skip first row and last row
-      keys = Object.keys(obj);
-      for (let j = 1; j < keys.length - 1; j++) {
-        let keyVal = keys[j];
-        if (Number(obj[keyVal]) < 5) {
-          obj["Other"] += Number(obj[keyVal]);
-          obj[keyVal] = 0;
-        }
-      }
-      obj["Other"] = String(Math.round(obj["Other"] * 100) / 100);
-    }
+    aggregateGroups(data);
 
     // Color encoding uses this later, header row.
     let subgroups = data.columns.slice(1);
 
     // X axis groups
-    //TODO parameterize group key...
-    let groups = d3.map(data, function (d) {
-      return d.Month;
-    });
+    let groups = getGroups(data);
 
     // Add X axis
     let x = d3.scaleBand().domain(groups).range([0, width]).padding([-0.2]);
@@ -60,14 +39,12 @@ function runGenSmallGraph() {
       xDom[Math.floor(xDom.length / 2)],
       xDom[xDom.length - 1],
     ];
-    svg
-      .append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(xLabels));
 
     // Add Y axis - lock to 0-100, assume 100% for data set.
     let y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
-    svg.append("g").call(d3.axisLeft(y).tickValues(d3.range(0, 101, 100 / 2)));
+    let yLabels = d3.range(0, 101, 100 / 2);
+
+    labelAxes(svg, height, x, xLabels, y, yLabels);
 
     //Large should allow any and all groupings, smaller will restrict to 6 total.
     let color = d3
@@ -79,35 +56,12 @@ function runGenSmallGraph() {
     let stackedData = d3.stack().keys(subgroups)(data);
 
     // draw bars
+    let firstColHeader = Object.keys(data[0])[0];
+    drawBars(svg, stackedData, firstColHeader, color, x, y);
+
+    //add hover effects for interaction
     svg
-      .append("g")
-      .selectAll("g")
-      // Enter in the stack data, iterate over groupings (i.e X axis)
-      .data(stackedData)
-      .enter()
-      .append("g")
-      .attr("fill", function (d) {
-        if (d.key === "Other") return "#444444";
-        return color(d.key);
-      })
       .selectAll("rect")
-      // enter a second time, iterate over subgroupings (i.e. Color encodings, the stack)
-      .data(function (d) {
-        return d;
-      })
-      .enter()
-      .append("rect")
-      .attr("x", function (d) {
-        return x(d.data.Month);
-      })
-      .attr("y", function (d) {
-        return y(d[1]);
-      })
-      .attr("height", function (d) {
-        return y(d[0]) - y(d[1]);
-      })
-      .attr("width", x.bandwidth())
-      //Adding hover effects in
       .on("mouseover", function (event, d) {
         d3.select(this).transition().duration("50").attr("opacity", ".75");
         //show the hover
@@ -136,62 +90,40 @@ function runGenMedGraph() {
     height = 256;
 
   // append the svg object to the body of the page
-  let svg = d3
-    .select("#graph")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  let svg = setupSVG(margin, width, height);
 
   // Parse the Data
   d3.csv(
     "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
   ).then(function (data) {
     //need to aggregate small % into Other
-    for (let i = 0; i < data.length; i++) {
-      obj = data[i];
-      obj["Other"] = Number(obj["Other"]);
-
-      //skip first row and last row
-      keys = Object.keys(obj);
-      for (let j = 1; j < keys.length - 1; j++) {
-        let keyVal = keys[j];
-        if (Number(obj[keyVal]) < 5) {
-          obj["Other"] += Number(obj[keyVal]);
-          obj[keyVal] = 0;
-        }
-      }
-      obj["Other"] = String(obj["Other"]);
-    }
+    aggregateGroups(data);
 
     // Color encoding uses this later, header row.
     let subgroups = data.columns.slice(1);
 
     // X axis groups
-    let groups = d3.map(data, function (d) {
-      return d.Month;
-    });
+    let groups = getGroups(data);
 
     // Add X axis
-
     let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.2]);
     let xLabels = x.domain().filter((element, index) => {
       return index % 4 === 0;
     });
+
+    // Add Y axis - lock to 0-100, assume 100% for data set. TODO update range to be dynamic.
+    let y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+    let yLabels = d3.range(0, 101, 100 / 5);
+
+    //add axes to graph, then adjust for this size graph
+    labelAxes(svg, height, x, xLabels, y, yLabels);
+    svg.selectAll("text").style("font-size", "12px");
     svg
-      .append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(xLabels))
-      .selectAll("text")
+      .selectAll("#xAxis text")
       .style("text-anchor", "end")
       .attr("dx", "-.75em")
       .attr("dy", ".07em")
       .attr("transform", "rotate(-45)");
-
-    // Add Y axis - lock to 0-100, assume 100% for data set. TODO update range to be dynamic.
-    let y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
-    svg.append("g").call(d3.axisLeft(y).tickValues(d3.range(0, 101, 100 / 5)));
 
     //Large should allow any and all groupings, smaller will restrict to 6 total.
     let color = d3
@@ -203,34 +135,8 @@ function runGenMedGraph() {
     let stackedData = d3.stack().keys(subgroups)(data);
 
     // draw bars
-    svg
-      .append("g")
-      .selectAll("g")
-      // Enter in the stack data, iterate over groupings (i.e X axis)
-      .data(stackedData)
-      .enter()
-      .append("g")
-      .attr("fill", function (d) {
-        if (d.key === "Other") return "#444444";
-        return color(d.key);
-      })
-      .selectAll("rect")
-      // enter a second time, iterate over subgroupings (i.e. Color encodings, the stack)
-      .data(function (d) {
-        return d;
-      })
-      .enter()
-      .append("rect")
-      .attr("x", function (d) {
-        return x(d.data.Month);
-      })
-      .attr("y", function (d) {
-        return y(d[1]);
-      })
-      .attr("height", function (d) {
-        return y(d[0]) - y(d[1]);
-      })
-      .attr("width", x.bandwidth());
+    let firstColHeader = Object.keys(data[0])[0];
+    drawBars(svg, stackedData, firstColHeader, color, x, y);
   });
 }
 
@@ -243,15 +149,8 @@ function runGenLargeGraph() {
     height = 400 - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
-  let svg = d3
-    .select("#graph")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  // Parse the Data
+  let svg = setupSVG(margin, width, height);
+  // Parse the Data. Gets fresh copy of data each time to avoid updates from other two fns.
   d3.csv(
     "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
   ).then(function (data) {
@@ -259,78 +158,129 @@ function runGenLargeGraph() {
     let subgroups = data.columns.slice(1);
 
     // X axis groups
-    let groups = d3.map(data, function (d) {
-      return d.Month;
-    });
+    let groups = getGroups(data);
 
-    // Add X axis
+    // specify x axis and label
     let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.2]);
     let xLabels = x.domain().filter((element, index) => {
       return index % 2 === 0;
     });
+
+    // specify y axis and label. lock to 0-100, assume 100% for data set.
+    let y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+    let yLabels = d3.range(0, 101, 100 / 10);
+
+    //add axes to graph, then adjust for this size graph
+    labelAxes(svg, height, x, xLabels, y, yLabels);
+    svg.selectAll("text").style("font-size", "12px");
     svg
-      .append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(xLabels))
-      .selectAll("text")
+      .selectAll("#xAxis text")
       .style("text-anchor", "end")
       .attr("dx", "-.75em")
       .attr("dy", ".07em")
-      .attr("transform", "rotate(-45)")
-      .style("font-size", "12px");
-
-    // Add Y axis - lock to 0-100, assume 100% for data set.
-    let y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
-    svg.append("g").call(d3.axisLeft(y)).style("font-size", "12px");
+      .attr("transform", "rotate(-45)");
 
     //Large should allow any and all groupings, smaller will restrict to 6 total.
     let color = d3
       .scaleOrdinal()
       .domain(subgroups)
-      .range([
-        "#e41a1c",
-        "#377eb8",
-        "#4daf4a",
-        "#984ea3",
-        "#ff7f00",
-        "#444444",
-      ]);
+      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
 
     //stack by subgroup
     let stackedData = d3.stack().keys(subgroups)(data);
 
     // draw bars
-    svg
-      .append("g")
-      .selectAll("g")
-      // Enter in the stack data, iterate over groupings (i.e X axis)
-      .data(stackedData)
-      .enter()
-      .append("g")
-      .attr("fill", function (d) {
-        return color(d.key);
-      })
-      .selectAll("rect")
-      // enter a second time, iterate over subgroupings (i.e. Color encodings, the stack)
-      .data(function (d) {
-        return d;
-      })
-      .enter()
-      .append("rect")
-      .attr("x", function (d) {
-        return x(d.data.Month);
-      })
-      .attr("y", function (d) {
-        return y(d[1]);
-      })
-      .attr("height", function (d) {
-        return y(d[0]) - y(d[1]);
-      })
-      .attr("width", x.bandwidth());
+    let firstColHeader = Object.keys(data[0])[0];
+    drawBars(svg, stackedData, firstColHeader, color, x, y);
   });
 }
 
+//get the key from the value, opposite way as normal
 function getKeyByValue(object, value) {
   value = String(value);
   return Object.keys(object).find((key) => object[key] === value);
+}
+
+//identify the groups in data, first column data
+function getGroups(data) {
+  let firstColHeader = Object.keys(data[0])[0];
+  let groups = d3.map(data, function (d) {
+    return d[firstColHeader];
+  });
+  return groups;
+}
+
+//setup and return svg
+function setupSVG(margin, width, height) {
+  return d3
+    .select("#graph")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+}
+
+//aggregation of the groups, mutates the passed object
+function aggregateGroups(data) {
+  for (let i = 0; i < data.length; i++) {
+    obj = data[i];
+    obj["Other"] = Number(obj["Other"]);
+
+    //skip first row and last row
+    keys = Object.keys(obj);
+    for (let j = 1; j < keys.length - 1; j++) {
+      let keyVal = keys[j];
+      if (Number(obj[keyVal]) < 5) {
+        obj["Other"] += Number(obj[keyVal]);
+        obj[keyVal] = 0;
+      }
+    }
+
+    obj["Other"] = String(Math.round(obj["Other"] * 100) / 100);
+  }
+}
+
+//draw bars in the SVG using the given data and axes
+function drawBars(svg, stackedData, firstColHeader, color, x, y) {
+  svg
+    .append("g")
+    .selectAll("g")
+    // Enter in the stack data, iterate over groupings (i.e X axis)
+    .data(stackedData)
+    .enter()
+    .append("g")
+    .attr("fill", function (d) {
+      if (d.key === "Other") return "#444444";
+      return color(d.key);
+    })
+    .selectAll("rect")
+    // enter a second time, iterate over subgroupings (i.e. Color encodings, the stack)
+    .data(function (d) {
+      return d;
+    })
+    .enter()
+    .append("rect")
+    .attr("x", function (d) {
+      return x(d.data[firstColHeader]);
+    })
+    .attr("y", function (d) {
+      return y(d[1]);
+    })
+    .attr("height", function (d) {
+      return y(d[0]) - y(d[1]);
+    })
+    .attr("width", x.bandwidth());
+}
+
+function labelAxes(svg, height, x, xLabels, y, yLabels) {
+  //handle y label first, then adjust placement and place x labels
+  svg
+    .append("g")
+    .attr("id", "yAxis")
+    .call(d3.axisLeft(y).tickValues(yLabels))
+    .append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .attr("id", "xAxis")
+    .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(xLabels));
 }
