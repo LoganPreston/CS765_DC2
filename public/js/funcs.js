@@ -148,7 +148,7 @@ function runGenLargeGraph() {
   // set the dimensions and margins of the graph
   let margin = { top: 10, right: 250, bottom: 100, left: 250 },
     width = 1000 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    height = 600 - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
   let svg = setupSVG(margin, width, height);
