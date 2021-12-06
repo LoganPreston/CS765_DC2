@@ -23,7 +23,7 @@ function runGenSmallGraph() {
   ).then(function (data) {
     //TODO Instead of aggregate small %, should aggregate smallest percentages until have only 6 categories.
     //need to aggregate small % into Other
-    aggregateGroups(data);
+    let bigGroups = aggregateGroups(data);
 
     // Color encoding uses this later, header row.
     let subgroups = data.columns.slice(1);
@@ -97,7 +97,7 @@ function runGenMedGraph() {
     "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
   ).then(function (data) {
     //need to aggregate small % into Other
-    aggregateGroups(data);
+    let bigGroups = aggregateGroups(data);
 
     // Color encoding uses this later, header row.
     let subgroups = data.columns.slice(1);
@@ -137,6 +137,8 @@ function runGenMedGraph() {
     // draw bars
     let firstColHeader = Object.keys(data[0])[0];
     drawBars(svg, stackedData, firstColHeader, color, x, y);
+    //pull the legend in
+    addLegend(svg, width, color, bigGroups);
   });
 }
 
@@ -184,7 +186,20 @@ function runGenLargeGraph() {
     let color = d3
       .scaleOrdinal()
       .domain(subgroups)
-      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
+      .range([
+        "#a6cee3",
+        "#1f78b4",
+        "#b2df8a",
+        "#33a02c",
+        "#fb9a99",
+        "#e31a1c",
+        "#fdbf6f",
+        "#ff7f00",
+        "#cab2d6",
+        "#6a3d9a",
+        "#ffff99",
+        "#b15928",
+      ]);
 
     //stack by subgroup
     let stackedData = d3.stack().keys(subgroups)(data);
@@ -192,6 +207,9 @@ function runGenLargeGraph() {
     // draw bars
     let firstColHeader = Object.keys(data[0])[0];
     drawBars(svg, stackedData, firstColHeader, color, x, y);
+
+    //Add legend - note we pass subgroups, which is everything
+    addLegend(svg, width, color, subgroups);
   });
 }
 
@@ -223,6 +241,7 @@ function setupSVG(margin, width, height) {
 
 //aggregation of the groups, mutates the passed object
 function aggregateGroups(data) {
+  let largeGroups = new Set();
   for (let i = 0; i < data.length; i++) {
     obj = data[i];
     obj["Other"] = Number(obj["Other"]);
@@ -235,10 +254,16 @@ function aggregateGroups(data) {
         obj["Other"] += Number(obj[keyVal]);
         obj[keyVal] = 0;
       }
+      //if it's big enough, add this group to the returned set.
+      else {
+        largeGroups.add(keyVal);
+      }
     }
 
     obj["Other"] = String(Math.round(obj["Other"] * 100) / 100);
   }
+  if (Number(obj["Other"]) >= 5) largeGroups.add("Other");
+  return largeGroups;
 }
 
 //draw bars in the SVG using the given data and axes
@@ -283,4 +308,49 @@ function labelAxes(svg, height, x, xLabels, y, yLabels) {
     .attr("transform", "translate(0," + height + ")")
     .attr("id", "xAxis")
     .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(xLabels));
+}
+
+function addLegend(svg, width, color, bigGroups) {
+  //legend
+  // Add one dot in the legend for each name.
+  let startPos = 0;
+  let padding = 25;
+  let legendSize = 10;
+
+  // squares for each major color
+  svg
+    .selectAll("mydots")
+    .data(bigGroups)
+    .enter()
+    .append("rect")
+    .attr("x", width + legendSize * 2)
+    .attr("y", function (d, i) {
+      return startPos + i * padding;
+    })
+    .attr("width", legendSize)
+    .attr("height", legendSize)
+    .style("fill", function (d) {
+      if (d === "Other") return "#444444";
+      return color(d);
+    });
+
+  // names for the squares
+  svg
+    .selectAll("mylabels")
+    .data(bigGroups)
+    .enter()
+    .append("text")
+    .attr("x", width + legendSize * 4)
+    .attr("y", function (d, i) {
+      return startPos + i * padding + legendSize / 2;
+    })
+    .style("fill", function (d) {
+      if (d === "Other") return "#444444";
+      return color(d);
+    })
+    .text((d) => {
+      return d;
+    })
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle");
 }
