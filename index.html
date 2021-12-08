@@ -11,30 +11,18 @@
     </div>
     <div class="buttonBlock">
       <nav>
-        <ul>
-          <li>
-            <button onclick="window.location.reload()" class="setup button">
-              Reset
-            </button>
-            <button
-              id="small"
-              class="setup button"
-              onclick="runGenSmallGraph()"
-            >
-              Generate Small Graph
-            </button>
-            <button id="medium" class="setup button" onclick="runGenMedGraph()">
-              Generate Medium Graph
-            </button>
-            <button
-              id="large"
-              class="setup button"
-              onclick="runGenLargeGraph()"
-            >
-              Generate Large Graph
-            </button>
-          </li>
-        </ul>
+        <button onclick="window.location.reload()" class="setup button">
+          Reset
+        </button>
+        <button id="small" class="setup button" onclick="runGenSmallGraph()">
+          Generate Small Graph
+        </button>
+        <button id="medium" class="setup button" onclick="runGenMedGraph()">
+          Generate Medium Graph
+        </button>
+        <button id="large" class="setup button" onclick="runGenLargeGraph()">
+          Generate Large Graph
+        </button>
       </nav>
     </div>
     <div id="graph" class="graphClass"></div>

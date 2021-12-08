@@ -26,10 +26,6 @@ nav {
   width: 200px;
 }
 
-ul {
-  list-style-type: none;
-}
-
 .header {
   text-align: center;
 }
@@ -43,6 +39,7 @@ svg {
   margin: auto;
   display: block;
 }
+
 .hover {
   position: absolute;
   text-align: center;
