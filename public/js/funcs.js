@@ -26,11 +26,8 @@ function runGenSmallGraph() {
 
   // Parse the Data and plot
   d3.csv(filePath).then(function (data) {
-    //need to aggregate small % into Other
-    let bigGroups = aggregateGroups(data, 5);
-
-    // Color encoding uses this later, header row.
-    let subgroups = data.columns.slice(1);
+    //need to aggregate small % into Other, color encoding and stacking uses this later. Header info
+    let subgroups = aggregateGroups(data, 5);
 
     // X axis groups
     let groups = getGroups(data);
@@ -38,7 +35,7 @@ function runGenSmallGraph() {
     //Large should allow any and all groupings, smaller will restrict to 6 total.
     let color = d3
       .scaleOrdinal()
-      .domain(bigGroups)
+      .domain(subgroups)
       .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
 
     // Add X axis
@@ -56,7 +53,7 @@ function runGenSmallGraph() {
 
     labelAxes(svg, height, x, xLabels, y, yLabels);
 
-    //stack by subgroup
+    //stack by major contributors, rather than all of them
     let stackedData = d3.stack().keys(subgroups)(data);
 
     // draw bars
@@ -98,11 +95,8 @@ function runGenMedGraph() {
 
   // Parse the Data
   d3.csv(filePath).then(function (data) {
-    //need to aggregate small % into Other
-    let bigGroups = aggregateGroups(data);
-
-    // Color encoding uses this later, header row.
-    let subgroups = data.columns.slice(1);
+    //need to aggregate small % into Other, color encoding and stacking uses this later. Header info
+    let subgroups = aggregateGroups(data);
 
     // X axis groups
     let groups = getGroups(data);
@@ -110,7 +104,7 @@ function runGenMedGraph() {
     //Large should allow any and all groupings, smaller will restrict to 6 total.
     let color = d3
       .scaleOrdinal()
-      .domain(bigGroups)
+      .domain(subgroups)
       .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
 
     // Add X axis
@@ -133,14 +127,14 @@ function runGenMedGraph() {
       .attr("dy", ".07em")
       .attr("transform", "rotate(-45)");
 
-    //stack by subgroup
+    //stack by major contributors, rather than all of them
     let stackedData = d3.stack().keys(subgroups)(data);
 
     // draw bars
     let firstColHeader = Object.keys(data[0])[0];
     drawBars(svg, stackedData, firstColHeader, color, x, y);
     //pull the legend in
-    addLegend(svg, width, color, bigGroups);
+    addLegend(svg, width, color, subgroups);
   });
 }
 
