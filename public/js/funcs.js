@@ -1,3 +1,10 @@
+//file options
+//  browser data: "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
+//  OS data: https://raw.githubusercontent.com/LoganPreston/data/main/os_combined-ww-monthly-201910-202110.csv
+//  Search engine data: https://raw.githubusercontent.com/LoganPreston/data/main/search_engine-ww-monthly-201910-202110.csv
+let filePath =
+  "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv";
+
 function runGenSmallGraph() {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
@@ -18,18 +25,21 @@ function runGenSmallGraph() {
   let svg = setupSVG(margin, width, height);
 
   // Parse the Data and plot
-  d3.csv(
-    "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
-  ).then(function (data) {
-    //TODO Instead of aggregate small %, should aggregate smallest percentages until have only 6 categories.
+  d3.csv(filePath).then(function (data) {
     //need to aggregate small % into Other
-    let bigGroups = aggregateGroups(data);
+    let bigGroups = aggregateGroups(data, 5);
 
     // Color encoding uses this later, header row.
     let subgroups = data.columns.slice(1);
 
     // X axis groups
     let groups = getGroups(data);
+
+    //Large should allow any and all groupings, smaller will restrict to 6 total.
+    let color = d3
+      .scaleOrdinal()
+      .domain(bigGroups)
+      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
 
     // Add X axis
     let x = d3.scaleBand().domain(groups).range([0, width]).padding([-0.2]);
@@ -45,12 +55,6 @@ function runGenSmallGraph() {
     let yLabels = d3.range(0, 101, 100 / 2);
 
     labelAxes(svg, height, x, xLabels, y, yLabels);
-
-    //Large should allow any and all groupings, smaller will restrict to 6 total.
-    let color = d3
-      .scaleOrdinal()
-      .domain(subgroups)
-      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
 
     //stack by subgroup
     let stackedData = d3.stack().keys(subgroups)(data);
@@ -93,9 +97,7 @@ function runGenMedGraph() {
   let svg = setupSVG(margin, width, height);
 
   // Parse the Data
-  d3.csv(
-    "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
-  ).then(function (data) {
+  d3.csv(filePath).then(function (data) {
     //need to aggregate small % into Other
     let bigGroups = aggregateGroups(data);
 
@@ -105,8 +107,14 @@ function runGenMedGraph() {
     // X axis groups
     let groups = getGroups(data);
 
+    //Large should allow any and all groupings, smaller will restrict to 6 total.
+    let color = d3
+      .scaleOrdinal()
+      .domain(bigGroups)
+      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
+
     // Add X axis
-    let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.5]);
+    let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.2]);
     let xLabels = x.domain().filter((element, index) => {
       return index % 4 === 0;
     });
@@ -124,12 +132,6 @@ function runGenMedGraph() {
       .attr("dx", "-.75em")
       .attr("dy", ".07em")
       .attr("transform", "rotate(-45)");
-
-    //Large should allow any and all groupings, smaller will restrict to 6 total.
-    let color = d3
-      .scaleOrdinal()
-      .domain(subgroups)
-      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
 
     //stack by subgroup
     let stackedData = d3.stack().keys(subgroups)(data);
@@ -153,9 +155,7 @@ function runGenLargeGraph() {
   // append the svg object to the body of the page
   let svg = setupSVG(margin, width, height);
   // Parse the Data. Gets fresh copy of data each time to avoid updates from other two fns.
-  d3.csv(
-    "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
-  ).then(function (data) {
+  d3.csv(filePath).then(function (data) {
     // Color encoding uses this later, header row.
     let subgroups = data.columns.slice(1);
 
@@ -163,7 +163,7 @@ function runGenLargeGraph() {
     let groups = getGroups(data);
 
     // specify x axis and label
-    let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.2]);
+    let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.4]);
     let xLabels = x.domain().filter((element, index) => {
       return index % 2 === 0;
     });
@@ -240,8 +240,9 @@ function setupSVG(margin, width, height) {
 }
 
 //aggregation of the groups, mutates the passed object
-function aggregateGroups(data) {
+function aggregateGroups(data, maxColors) {
   let largeGroups = new Set();
+  const thresh = 5;
   for (let i = 0; i < data.length; i++) {
     obj = data[i];
     obj["Other"] = Number(obj["Other"]);
@@ -250,8 +251,14 @@ function aggregateGroups(data) {
     keys = Object.keys(obj);
     for (let j = 1; j < keys.length - 1; j++) {
       let keyVal = keys[j];
-      if (Number(obj[keyVal]) < 5) {
-        obj["Other"] += Number(obj[keyVal]);
+      let contribution = Number(obj[keyVal]);
+      //group it if Other is small and this is a small contributor, or if it's a very small contributor
+      //TODO evaluate if contribution < obj["Other"] makes sense
+      if (
+        (contribution < thresh && obj["Other"] < thresh) ||
+        contribution < thresh / 2
+      ) {
+        obj["Other"] += contribution;
         obj[keyVal] = 0;
       }
       //if it's big enough, add this group to the returned set.
@@ -262,7 +269,7 @@ function aggregateGroups(data) {
 
     obj["Other"] = String(Math.round(obj["Other"] * 100) / 100);
   }
-  if (Number(obj["Other"]) >= 5) largeGroups.add("Other");
+  if (Number(obj["Other"]) > 0) largeGroups.add("Other");
   return largeGroups;
 }
 
