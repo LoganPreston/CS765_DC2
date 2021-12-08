@@ -106,7 +106,7 @@ function runGenMedGraph() {
     let groups = getGroups(data);
 
     // Add X axis
-    let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.2]);
+    let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.5]);
     let xLabels = x.domain().filter((element, index) => {
       return index % 4 === 0;
     });
@@ -313,9 +313,9 @@ function labelAxes(svg, height, x, xLabels, y, yLabels) {
 function addLegend(svg, width, color, bigGroups) {
   //legend
   // Add one dot in the legend for each name.
-  let startPos = 0;
-  let padding = 25;
-  let legendSize = 10;
+  let startPos = 0,
+    padding = 25,
+    legendSize = 10;
 
   // squares for each major color
   svg
