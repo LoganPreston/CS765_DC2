@@ -56,7 +56,7 @@ function addAxes(svg, height, x, xLabels, y, yLabels) {
 function addLegend(svg, width, color, bigGroups) {
   //legend
   // Add one dot in the legend for each name.
-  let startPos = 0,
+  const startPos = 0,
     padding = 25,
     legendSize = 10;
 
@@ -67,13 +67,13 @@ function addLegend(svg, width, color, bigGroups) {
     .enter()
     .append("rect")
     .attr("x", width + legendSize * 2)
-    .attr("y", function (d, i) {
-      return startPos + i * padding;
+    .attr("y", function (element, index) {
+      return startPos + index * padding;
     })
     .attr("width", legendSize)
     .attr("height", legendSize)
-    .style("fill", function (d) {
-      return color(d);
+    .style("fill", function (element) {
+      return color(element);
     });
 
   // names for the squares
@@ -83,15 +83,44 @@ function addLegend(svg, width, color, bigGroups) {
     .enter()
     .append("text")
     .attr("x", width + legendSize * 4)
-    .attr("y", function (d, i) {
-      return startPos + i * padding + legendSize;
+    .attr("y", function (element, index) {
+      return startPos + index * padding + legendSize;
     })
-    .style("fill", function (d) {
-      return color(d);
+    .style("fill", function (element) {
+      return color(element);
     })
-    .text((d) => {
-      return d;
+    .text((element) => {
+      return element;
     })
     .attr("text-anchor", "left")
     .style("alignment-baseline", "middle");
+}
+
+function setupHover() {
+  return d3
+    .select("#graph")
+    .append("div")
+    .attr("class", "hover")
+    .style("opacity", 0);
+}
+
+function addHover(svg, hover) {
+  svg
+    .selectAll("rect")
+    .on("mouseover", function (event, d) {
+      d3.select(this).transition().duration("50").attr("opacity", ".75");
+      //show the hover
+      hover.transition().duration(50).style("opacity", "1");
+      let val = Math.round((d[1] - d[0]) * 100) / 100;
+      let browser = getKeyByValue(d.data, val);
+      hover
+        .html(browser + ": " + val)
+        .style("left", event.screenX - 25 + "px")
+        .style("top", event.screenY - 75 + "px");
+    })
+    .on("mouseout", function (d, i) {
+      d3.select(this).transition().duration("50").attr("opacity", "1");
+      //Makes the new div appear on hover:
+      hover.transition().duration("50").style("opacity", "0");
+    });
 }
