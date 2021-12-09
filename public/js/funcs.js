@@ -36,7 +36,14 @@ function runGenSmallGraph() {
     let color = d3
       .scaleOrdinal()
       .domain(subgroups)
-      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
+      .range([
+        "#e41a1c",
+        "#377eb8",
+        "#4daf4a",
+        "#984ea3",
+        "#ff7f00",
+        "#555555",
+      ]);
 
     // Add X axis
     let x = d3.scaleBand().domain(groups).range([0, width]).padding([-0.2]);
@@ -96,7 +103,7 @@ function runGenMedGraph() {
   // Parse the Data
   d3.csv(filePath).then(function (data) {
     //need to aggregate small % into Other, color encoding and stacking uses this later. Header info
-    let subgroups = aggregateGroups(data);
+    let subgroups = aggregateGroups(data, 3);
 
     // X axis groups
     let groups = getGroups(data);
@@ -105,7 +112,16 @@ function runGenMedGraph() {
     let color = d3
       .scaleOrdinal()
       .domain(subgroups)
-      .range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"]);
+      .range([
+        "#e41a1c",
+        "#377eb8",
+        "#4daf4a",
+        "#984ea3",
+        "#ff7f00",
+        "#a65628",
+        "#f781bf",
+        "#999999",
+      ]);
 
     // Add X axis
     let x = d3.scaleBand().domain(groups).range([0, width]).padding([0.2]);
@@ -151,7 +167,7 @@ function runGenLargeGraph() {
   // Parse the Data. Gets fresh copy of data each time to avoid updates from other two fns.
   d3.csv(filePath).then(function (data) {
     // Color encoding uses this later, header row.
-    let subgroups = data.columns.slice(1);
+    let subgroups = aggregateGroups(data, 1);
 
     // X axis groups
     let groups = getGroups(data);
@@ -176,7 +192,7 @@ function runGenLargeGraph() {
       .attr("dy", ".07em")
       .attr("transform", "rotate(-45)");
 
-    //Large should allow any and all groupings, smaller will restrict to 6 total.
+    //Large should allow any and all groupings, though colors are still limited to 12
     let color = d3
       .scaleOrdinal()
       .domain(subgroups)
@@ -191,10 +207,9 @@ function runGenLargeGraph() {
         "#ff7f00",
         "#cab2d6",
         "#6a3d9a",
-        "#ffff99",
         "#b15928",
+        "#999999",
       ]);
-
     //stack by subgroup
     let stackedData = d3.stack().keys(subgroups)(data);
 
@@ -234,9 +249,9 @@ function setupSVG(margin, width, height) {
 }
 
 //aggregation of the groups, mutates the passed object
-function aggregateGroups(data, maxColors) {
+function aggregateGroups(data, thresh) {
   let largeGroups = new Set();
-  const thresh = 5;
+
   for (let i = 0; i < data.length; i++) {
     obj = data[i];
     obj["Other"] = Number(obj["Other"]);
@@ -248,6 +263,7 @@ function aggregateGroups(data, maxColors) {
       let contribution = Number(obj[keyVal]);
       //group it if Other is small and this is a small contributor, or if it's a very small contributor
       //TODO evaluate if contribution < obj["Other"] makes sense
+      //TODO another aggregation strategy - aggregate until groups = num groups you have
       if (
         (contribution < thresh && obj["Other"] < thresh) ||
         contribution < thresh / 2
@@ -277,7 +293,6 @@ function drawBars(svg, stackedData, firstColHeader, color, x, y) {
     .enter()
     .append("g")
     .attr("fill", function (d) {
-      if (d.key === "Other") return "#444444";
       return color(d.key);
     })
     .selectAll("rect")
@@ -320,7 +335,7 @@ function addLegend(svg, width, color, bigGroups) {
 
   // squares for each major color
   svg
-    .selectAll("mydots")
+    .selectAll("dots")
     .data(bigGroups)
     .enter()
     .append("rect")
@@ -331,22 +346,20 @@ function addLegend(svg, width, color, bigGroups) {
     .attr("width", legendSize)
     .attr("height", legendSize)
     .style("fill", function (d) {
-      if (d === "Other") return "#444444";
       return color(d);
     });
 
   // names for the squares
   svg
-    .selectAll("mylabels")
+    .selectAll("labels")
     .data(bigGroups)
     .enter()
     .append("text")
     .attr("x", width + legendSize * 4)
     .attr("y", function (d, i) {
-      return startPos + i * padding + legendSize / 2;
+      return startPos + i * padding + legendSize;
     })
     .style("fill", function (d) {
-      if (d === "Other") return "#444444";
       return color(d);
     })
     .text((d) => {
