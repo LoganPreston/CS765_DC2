@@ -104,23 +104,24 @@ function setupHover() {
     .style("opacity", 0);
 }
 
-function addHover(svg, hover) {
+function addHover(svg, hover, firstColHeader) {
   svg
     .selectAll("rect")
     .on("mouseover", function (event, d) {
+      //dim the bar
       d3.select(this).transition().duration("50").attr("opacity", ".75");
       //show the hover
       hover.transition().duration(50).style("opacity", "1");
       let val = Math.round((d[1] - d[0]) * 100) / 100;
       let browser = getKeyByValue(d.data, val);
       hover
-        .html(browser + ": " + val)
+        .html(browser + ": " + val + "<br>" + d.data[firstColHeader])
         .style("left", event.screenX - 25 + "px")
         .style("top", event.screenY - 75 + "px");
     })
     .on("mouseout", function (d, i) {
+      //revert the bar, then disappear the hover
       d3.select(this).transition().duration("50").attr("opacity", "1");
-      //Makes the new div appear on hover:
       hover.transition().duration("50").style("opacity", "0");
     });
 }

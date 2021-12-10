@@ -55,7 +55,7 @@ function runGenTinyGraph() {
     addBars(svg, stackedData, firstColHeader, color, x, y);
 
     //add hover effects for interaction
-    addHover(svg, hover);
+    addHover(svg, hover, firstColHeader);
   });
 }
 
@@ -112,7 +112,7 @@ function runGenSmallGraph() {
     addBars(svg, stackedData, firstColHeader, color, x, y);
 
     //add hover effects for interaction
-    addHover(svg, hover);
+    addHover(svg, hover, firstColHeader);
   });
 }
 
