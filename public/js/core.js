@@ -113,6 +113,8 @@ function runGenSmallGraph() {
 
     //add hover effects for interaction
     addHover(svg, hover, firstColHeader);
+    //addLegend(svg, width, color, subgroups, 15, 5);
+    //svg.selectAll("text").style("font-size", "10px");
   });
 }
 
@@ -161,7 +163,6 @@ function runGenMedGraph() {
 
     //add axes and style them
     addAxes(svg, height, x, xLabels, y, yLabels);
-    svg.selectAll("text").style("font-size", "12px");
     svg
       .selectAll("#xAxis text")
       .style("text-anchor", "end")
@@ -175,7 +176,8 @@ function runGenMedGraph() {
     addBars(svg, stackedData, firstColHeader, color, x, y);
 
     //pull the legend in
-    addLegend(svg, width, color, subgroups);
+    addLegend(svg, width, color, subgroups, 20, 7.5);
+    svg.selectAll("text").style("font-size", "12px");
   });
 }
 
@@ -226,7 +228,6 @@ function runGenLargeGraph() {
 
     //add axes to graph, then adjust for this size graph
     addAxes(svg, height, x, xLabels, y, yLabels);
-    svg.selectAll("text").style("font-size", "12px");
     svg
       .selectAll("#xAxis text")
       .style("text-anchor", "end")
@@ -240,6 +241,7 @@ function runGenLargeGraph() {
     addBars(svg, stackedData, firstColHeader, color, x, y);
 
     //Add legend - note we pass subgroups, which is everything
-    addLegend(svg, width, color, subgroups);
+    addLegend(svg, width, color, subgroups, 25, 10);
+    svg.selectAll("text").style("font-size", "16px");
   });
 }

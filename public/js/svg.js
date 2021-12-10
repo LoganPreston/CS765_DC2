@@ -53,12 +53,10 @@ function addAxes(svg, height, x, xLabels, y, yLabels) {
     .call(d3.axisBottom(x).tickSizeOuter(0).tickValues(xLabels));
 }
 
-function addLegend(svg, width, color, bigGroups) {
+function addLegend(svg, width, color, bigGroups, padding, legendSize) {
   //legend
   // Add one dot in the legend for each name.
-  const startPos = 0,
-    padding = 25,
-    legendSize = 10;
+  const startPos = 0;
 
   // squares for each major color
   svg
