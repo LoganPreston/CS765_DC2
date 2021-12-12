@@ -13,7 +13,7 @@ function getGroups(data) {
   return groups;
 }
 
-//aggregation of the groups, mutates the passed object
+//aggregation of the groups, mutates the passed object. Returns a set of the aggregated group names
 function aggregateGroups(data, thresh) {
   let largeGroups = new Set();
 
@@ -21,24 +21,20 @@ function aggregateGroups(data, thresh) {
     obj = data[i];
     obj["Other"] = Number(obj["Other"]);
 
-    //skip first row and last row
+    //skip first row and last row (the x axis header and an other value)
     keys = Object.keys(obj);
     for (let j = 1; j < keys.length - 1; j++) {
-      let keyVal = keys[j];
-      let contribution = Number(obj[keyVal]);
+      let key = keys[j];
+      let val = Number(obj[key]);
+
       //group it if Other is small and this is a small contributor, or if it's a very small contributor
-      //TODO evaluate if contribution < obj["Other"] makes sense
-      //TODO another aggregation strategy - aggregate until groups = num groups you have
-      if (
-        (contribution < thresh && obj["Other"] < thresh) ||
-        contribution < thresh / 2
-      ) {
-        obj["Other"] += contribution;
-        obj[keyVal] = 0;
+      if ((val < thresh && obj["Other"] < thresh) || val < thresh / 2) {
+        obj["Other"] += val;
+        obj[key] = 0;
       }
       //if it's big enough, add this group to the returned set.
       else {
-        largeGroups.add(keyVal);
+        largeGroups.add(key);
       }
     }
 
