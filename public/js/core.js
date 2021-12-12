@@ -1,9 +1,9 @@
 //file options
-//  browser data: "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv"
-//  OS data: https://raw.githubusercontent.com/LoganPreston/data/main/os_combined-ww-monthly-201910-202110.csv
-//  Search engine data: https://raw.githubusercontent.com/LoganPreston/data/main/search_engine-ww-monthly-201910-202110.csv
+//  browser data: https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
+//  OS data: https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/os_combined-ww-monthly-201910-202110.csv
+//  Search engine data: https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/search_engine-ww-monthly-201910-202110.csv
 const filePath =
-  "https://raw.githubusercontent.com/LoganPreston/data/main/browser-ww-monthly-201910-202110.csv";
+  "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
 
 function runGenTinyGraph() {
   //sanity, remove any graph that exists currently.
