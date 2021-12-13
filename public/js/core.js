@@ -2,10 +2,10 @@
 //  browser data: https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
 //  OS data: https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/os_combined-ww-monthly-201910-202110.csv
 //  Search engine data: https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/search_engine-ww-monthly-201910-202110.csv
-const filePath =
-  "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
+//const filePath =
+//"https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
 
-function runGenTinyGraph(dimension) {
+function runGenTinyGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
   d3.select("#hover").remove();
@@ -71,7 +71,7 @@ function runGenTinyGraph(dimension) {
   });
 }
 
-function runGenSmallGraph(dimension) {
+function runGenSmallGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
   d3.select("#hover").remove();
@@ -135,7 +135,7 @@ function runGenSmallGraph(dimension) {
   });
 }
 
-function runGenMedGraph(dimension) {
+function runGenMedGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
   d3.select("#hover").remove();
@@ -199,7 +199,7 @@ function runGenMedGraph(dimension) {
   });
 }
 
-function runGenLargeGraph(dimension) {
+function runGenLargeGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
   d3.select("#hover").remove();

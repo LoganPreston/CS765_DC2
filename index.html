@@ -14,34 +14,66 @@
         <button onclick="window.location.reload()" class="setup button">
           Reset
         </button>
+
+        <br />
+        <input
+          type="radio"
+          name="dataType"
+          value="browser"
+          class="radio button"
+          id="browser"
+          checked="True"
+          onchange="genGraph('edgeSize')"
+        />
+        <label for="browser">Browser Data</label><br />
+        <input
+          type="radio"
+          name="dataType"
+          value="os"
+          class="radio button"
+          id="os"
+          onchange="genGraph('edgeSize')"
+        />
+        <label for="os">OS Data</label><br />
+        <input
+          type="radio"
+          name="dataType"
+          value="searchEngine"
+          class="radio button"
+          id="searchEngine"
+          onchange="genGraph('edgeSize')"
+        />
+        <label for="searchEngine">Search Engine Data</label><br />
+
         <button
           id="tiny"
           class="setup button"
-          onclick="updateSliderValConst(96,'edgeSize','edgeSizeVal');runGenTinyGraph()"
+          onclick="updateSliderValConst(96,'edgeSize','edgeSizeVal');genGraph('edgeSize')"
         >
           Generate Tiny Graph
         </button>
         <button
           id="small"
           class="setup button"
-          onclick="updateSliderValConst(170,'edgeSize','edgeSizeVal');runGenSmallGraph()"
+          onclick="updateSliderValConst(170,'edgeSize','edgeSizeVal');genGraph('edgeSize')"
         >
           Generate Small Graph
         </button>
         <button
           id="medium"
           class="setup button"
-          onclick="updateSliderValConst(256,'edgeSize','edgeSizeVal');runGenMedGraph()"
+          onclick="updateSliderValConst(256,'edgeSize','edgeSizeVal');genGraph('edgeSize')"
         >
           Generate Medium Graph
         </button>
         <button
           id="large"
           class="setup button"
-          onclick="updateSliderValConst(512,'edgeSize','edgeSizeVal');runGenLargeGraph()"
+          onclick="updateSliderValConst(512,'edgeSize','edgeSizeVal');genGraph('edgeSize')"
         >
           Generate Large Graph
         </button>
+
         <input
           type="range"
           min="96"

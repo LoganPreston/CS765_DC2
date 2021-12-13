@@ -59,14 +59,41 @@ function updateSliderValConst(value, sliderId, labelId) {
 }
 
 function genGraph(sliderId) {
+  const filePath = getFilePath();
   let size = Number(document.getElementById(sliderId).value);
   if (size > 375) {
-    runGenLargeGraph(size);
+    runGenLargeGraph(filePath, size);
   } else if (size > 215) {
-    runGenMedGraph(size);
+    runGenMedGraph(filePath, size);
   } else if (size > 150) {
-    runGenSmallGraph(size);
+    runGenSmallGraph(filePath, size);
   } else {
-    runGenTinyGraph(size);
+    runGenTinyGraph(filePath, size);
   }
+}
+
+function getFilePath() {
+  const buttons = document.getElementsByClassName("radio button");
+  //safety. this is the default.
+  let filePath =
+    "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
+
+  for (let i = 0; i < buttons.length; i++) {
+    if (!buttons[i].checked) continue;
+    let dataName = buttons[i].id;
+    if (dataName === "browser") {
+      filePath =
+        "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
+      break;
+    } else if (dataName === "os") {
+      filePath =
+        "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/os_combined-ww-monthly-201910-202110.csv";
+      break;
+    } else if (dataName === "searchEngine") {
+      filePath =
+        "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/search_engine-ww-monthly-201910-202110.csv";
+      break;
+    }
+  }
+  return filePath;
 }
