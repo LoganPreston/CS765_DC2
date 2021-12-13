@@ -43,3 +43,30 @@ function aggregateGroups(data, thresh) {
   if (Number(obj["Other"]) > 0) largeGroups.add("Other");
   return largeGroups;
 }
+
+function updateSliderVal(sliderId, labelId) {
+  let slider = document.getElementById(sliderId);
+  let label = document.getElementById(labelId);
+  label.innerHTML = slider.value;
+}
+
+function updateSliderValConst(value, sliderId, labelId) {
+  let slider = document.getElementById(sliderId);
+  let label = document.getElementById(labelId);
+
+  slider.value = value;
+  label.innerHTML = value;
+}
+
+function genGraph(sliderId) {
+  let size = Number(document.getElementById(sliderId).value);
+  if (size > 375) {
+    runGenLargeGraph(size);
+  } else if (size > 200) {
+    runGenMedGraph(size);
+  } else if (size > 150) {
+    runGenSmallGraph(size);
+  } else {
+    runGenTinyGraph(size);
+  }
+}

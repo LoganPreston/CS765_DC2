@@ -14,18 +14,45 @@
         <button onclick="window.location.reload()" class="setup button">
           Reset
         </button>
-        <!--<button id="tiny" class="setup button" onclick="runGenTinyGraph()">
+        <button
+          id="tiny"
+          class="setup button"
+          onclick="updateSliderValConst(96,'edgeSize','edgeSizeVal');runGenTinyGraph()"
+        >
           Generate Tiny Graph
-        </button>-->
-        <button id="small" class="setup button" onclick="runGenSmallGraph()">
+        </button>
+        <button
+          id="small"
+          class="setup button"
+          onclick="updateSliderValConst(170,'edgeSize','edgeSizeVal');runGenSmallGraph()"
+        >
           Generate Small Graph
         </button>
-        <button id="medium" class="setup button" onclick="runGenMedGraph()">
+        <button
+          id="medium"
+          class="setup button"
+          onclick="updateSliderValConst(256,'edgeSize','edgeSizeVal');runGenMedGraph()"
+        >
           Generate Medium Graph
         </button>
-        <button id="large" class="setup button" onclick="runGenLargeGraph()">
+        <button
+          id="large"
+          class="setup button"
+          onclick="updateSliderValConst(512,'edgeSize','edgeSizeVal');runGenLargeGraph()"
+        >
           Generate Large Graph
         </button>
+        <input
+          type="range"
+          min="96"
+          max="512"
+          value="512"
+          class="slider"
+          id="edgeSize"
+          oninput="updateSliderVal('edgeSize','edgeSizeVal');genGraph('edgeSize');"
+        />
+        <span id="edgeSizeVal"></span>
+        <p class="sliderLabel">Axis Size (px)</p>
       </nav>
     </div>
     <div id="graph" class="graphClass"></div>

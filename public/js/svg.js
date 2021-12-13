@@ -99,6 +99,7 @@ function setupHover() {
     .select("#graph")
     .append("div")
     .attr("class", "hover")
+    .attr("id", "hover")
     .style("opacity", 0);
 }
 

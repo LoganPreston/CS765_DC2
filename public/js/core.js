@@ -5,14 +5,15 @@
 const filePath =
   "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
 
-function runGenTinyGraph() {
+function runGenTinyGraph(dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
+  d3.select("#hover").remove();
 
   // set the dimensions and margins of the graph
   const margin = { top: 50, right: 250, bottom: 50, left: 250 },
-    width = 96,
-    height = 96;
+    width = dimension !== undefined ? dimension : 96,
+    height = dimension !== undefined ? dimension : 96;
 
   //hover for later
   const hover = setupHover();
@@ -43,59 +44,6 @@ function runGenTinyGraph() {
 
     // X and Y axis setup, then add to plot
 
-    const x = d3.scaleBand().domain(groups).range([0, width]).padding([-0.2]);
-    const xLabels = [groups[0], groups[groups.length - 1]];
-    const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
-    const yLabels = d3.range(0, 101, 100);
-    addAxes(svg, height, x, xLabels, y, yLabels);
-
-    // draw bars. stack by major contributors
-    const firstColHeader = Object.keys(data[0])[0];
-    const stackedData = d3.stack().keys(subgroups)(data);
-    addBars(svg, stackedData, firstColHeader, color, x, y);
-
-    //add hover effects for interaction
-    addHover(svg, hover, firstColHeader);
-  });
-}
-
-function runGenSmallGraph() {
-  //sanity, remove any graph that exists currently.
-  d3.select("#graph svg").remove();
-
-  // set the dimensions and margins of the graph
-  const margin = { top: 50, right: 250, bottom: 50, left: 250 },
-    width = 128,
-    height = 128;
-
-  //hover for later
-  const hover = setupHover();
-
-  // append the svg object to the body of the page
-  const svg = setupSVG(margin, width, height);
-
-  // Parse the Data and plot
-  d3.csv(filePath).then(function (data) {
-    //need to aggregate small % into Other, color encoding and stacking uses this later. Header info
-    const subgroups = aggregateGroups(data, 5);
-
-    //Small limited to 6 colors total
-    const color = d3
-      .scaleOrdinal()
-      .domain(subgroups)
-      .range([
-        "#e41a1c",
-        "#377eb8",
-        "#4daf4a",
-        "#984ea3",
-        "#ff7f00",
-        "#444444",
-      ]);
-
-    // X axis groups
-    const groups = getGroups(data);
-
-    // X and Y axis setup, then add to plot
     const x = d3.scaleBand().domain(groups).range([0, width]).padding([-0.2]);
     const xLabels = [
       groups[0],
@@ -103,7 +51,7 @@ function runGenSmallGraph() {
       groups[groups.length - 1],
     ];
     const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
-    const yLabels = d3.range(0, 101, 100 / 2);
+    const yLabels = d3.range(0, 101, 50);
     addAxes(svg, height, x, xLabels, y, yLabels);
 
     // draw bars. stack by major contributors
@@ -113,19 +61,82 @@ function runGenSmallGraph() {
 
     //add hover effects for interaction
     addHover(svg, hover, firstColHeader);
-    //addLegend(svg, width, color, subgroups, 15, 5);
-    //svg.selectAll("text").style("font-size", "10px");
   });
 }
 
-function runGenMedGraph() {
+function runGenSmallGraph(dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
+  d3.select("#hover").remove();
 
   // set the dimensions and margins of the graph
   const margin = { top: 50, right: 250, bottom: 50, left: 250 },
-    width = 256,
-    height = 256;
+    width = dimension !== undefined ? dimension : 170,
+    height = dimension !== undefined ? dimension : 170;
+
+  //hover for later
+  const hover = setupHover();
+
+  // append the svg object to the body of the page
+  const svg = setupSVG(margin, width, height);
+
+  // Parse the Data and plot
+  d3.csv(filePath).then(function (data) {
+    //need to aggregate small % into Other, color encoding and stacking uses this later. Header info
+    const subgroups = aggregateGroups(data, 5);
+
+    //Small limited to 6 colors total
+    const color = d3
+      .scaleOrdinal()
+      .domain(subgroups)
+      .range([
+        "#e41a1c",
+        "#377eb8",
+        "#4daf4a",
+        "#984ea3",
+        "#ff7f00",
+        "#444444",
+      ]);
+
+    // X axis groups
+    const groups = getGroups(data);
+
+    // X and Y axis setup, then add to plot
+    const x = d3.scaleBand().domain(groups).range([0, width]).padding([-0.2]);
+    const xLabels = groups.filter((element, index) => {
+      return index % 6 === 0;
+    });
+    const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+    const yLabels = d3.range(0, 101, 100 / 4);
+    addAxes(svg, height, x, xLabels, y, yLabels);
+
+    // draw bars. stack by major contributors
+    const firstColHeader = Object.keys(data[0])[0];
+    const stackedData = d3.stack().keys(subgroups)(data);
+    addBars(svg, stackedData, firstColHeader, color, x, y);
+
+    //add hover effects for interaction
+    addHover(svg, hover, firstColHeader);
+    addLegend(svg, width, color, subgroups, 15, 5);
+    svg.selectAll("text").style("font-size", "10px");
+    svg
+      .selectAll("#xAxis text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.75em")
+      .attr("dy", ".07em")
+      .attr("transform", "rotate(-45)");
+  });
+}
+
+function runGenMedGraph(dimension) {
+  //sanity, remove any graph that exists currently.
+  d3.select("#graph svg").remove();
+  d3.select("#hover").remove();
+
+  // set the dimensions and margins of the graph
+  const margin = { top: 50, right: 250, bottom: 50, left: 250 },
+    width = dimension !== undefined ? dimension : 256,
+    height = dimension !== undefined ? dimension : 256;
 
   // append the svg object to the body of the page
   const svg = setupSVG(margin, width, height);
@@ -181,14 +192,17 @@ function runGenMedGraph() {
   });
 }
 
-function runGenLargeGraph() {
+function runGenLargeGraph(dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
+  d3.select("#hover").remove();
 
   // set the dimensions and margins of the graph
   const margin = { top: 50, right: 250, bottom: 100, left: 250 },
-    width = 1000 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+    width =
+      dimension !== undefined ? dimension : 1000 - margin.left - margin.right,
+    height =
+      dimension !== undefined ? dimension : 600 - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
   const svg = setupSVG(margin, width, height);
