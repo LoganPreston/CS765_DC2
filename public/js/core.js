@@ -5,6 +5,12 @@
 //const filePath =
 //"https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
 
+/**
+ * Create a tiny graph from the data passed in.
+ * Supports 6 colors, NO legend, has interaction, has some aggregation
+ * @param {String} filePath - path to the data to process. Must be CSV
+ * @param {Number} dimension - X and Y dimension in pixels. Default is 96 px
+ */
 function runGenTinyGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
@@ -71,6 +77,12 @@ function runGenTinyGraph(filePath, dimension) {
   });
 }
 
+/**
+ * Create a small graph from the data passed in.
+ * Supports 6 colors, has legend, has interaction, has some aggregation
+ * @param {String} filePath - path to the data to process. Must be CSV
+ * @param {Number} dimension - X and Y dimension in pixels. Default is 170 px
+ */
 function runGenSmallGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
@@ -135,6 +147,12 @@ function runGenSmallGraph(filePath, dimension) {
   });
 }
 
+/**
+ * Create a medium sized graph from the data passed in.
+ * Supports 8 Colors. Has Legend, No interaction, some aggregation.
+ * @param {String} filePath - path to the data to process. Must be CSV
+ * @param {Number} dimension - X and Y dimension in pixels. Default is 256 px
+ */
 function runGenMedGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();
@@ -199,6 +217,12 @@ function runGenMedGraph(filePath, dimension) {
   });
 }
 
+/**
+ * Create a large graph from the data passed in.
+ * Supports 10 colors, has legend, no interaction. Minimal group aggregation
+ * @param {String} filePath - path to the data to process. Must be CSV
+ * @param {Number} dimension - X and Y dimension in pixels. Default is 512 px
+ */
 function runGenLargeGraph(filePath, dimension) {
   //sanity, remove any graph that exists currently.
   d3.select("#graph svg").remove();

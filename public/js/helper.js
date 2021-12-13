@@ -1,10 +1,19 @@
-//get the key from the value, opposite way as normal
+/**
+ *
+ * @param {Object} object - object to get key from
+ * @param {Value} value - val of obj[key]
+ * @returns key corresponding to value in obj
+ */
 function getKeyByValue(object, value) {
   value = String(value);
   return Object.keys(object).find((key) => object[key] === value);
 }
 
-//identify the groups in data, first column data
+/**
+ * Identify the groups in the data, from the first column, return array of groups for xAxis label
+ * @param {*} data - Parse CSV with D3 style. Object of objects that hold each row of data-
+ * @returns first column groups, which should represent the X axis on a graph
+ */
 function getGroups(data) {
   let firstColHeader = Object.keys(data[0])[0];
   let groups = d3.map(data, function (d) {
@@ -13,7 +22,14 @@ function getGroups(data) {
   return groups;
 }
 
-//aggregation of the groups, mutates the passed object. Returns a set of the aggregated group names
+/**
+ * aggregation of the groups, mutates the passed object. Returns a set of the aggregated group names
+ * @param {*} data - Data to aggregate. Parse CSV with D3 style. Object of objects that hold each row of data
+ * @param {Number} thresh - threshold to aggregate to. Groups with less than half this value will be fully aggregated.
+ *                          Groups under this value, but more than half of it, will be aggregated if the other group
+ *                          is less than this value.
+ * @returns Set of aggregated group names
+ */
 function aggregateGroups(data, thresh) {
   let largeGroups = new Set();
 
@@ -44,12 +60,23 @@ function aggregateGroups(data, thresh) {
   return largeGroups;
 }
 
+/**
+ * update the slider value to what it was dragged to. Just displays the dragged value
+ * @param {String} sliderId ID of the slider to update
+ * @param {String} labelId ID of the label for the slider to update
+ */
 function updateSliderVal(sliderId, labelId) {
   let slider = document.getElementById(sliderId);
   let label = document.getElementById(labelId);
   label.innerHTML = slider.value;
 }
 
+/**
+ * update the slider to some constant value. Show on the label as well
+ * @param {Number} value value to update the slider and label to
+ * @param {String} sliderId ID of the slider to update
+ * @param {String} labelId ID of the label for the slider to update
+ */
 function updateSliderValConst(value, sliderId, labelId) {
   let slider = document.getElementById(sliderId);
   let label = document.getElementById(labelId);
@@ -58,6 +85,11 @@ function updateSliderValConst(value, sliderId, labelId) {
   label.innerHTML = value;
 }
 
+/**
+ * MAIN DRIVER this is called by buttons and slider.
+ *  Picks which graph to display based on slider setting
+ *  Picks the filePath based on user selection
+ */
 function genGraph(sliderId) {
   const filePath = getFilePath();
   let size = Number(document.getElementById(sliderId).value);
@@ -72,6 +104,10 @@ function genGraph(sliderId) {
   }
 }
 
+/**
+ * Identify the filePath based on which radio button is selected
+ * @returns: String of the filepath to the data stored in csv
+ */
 function getFilePath() {
   const buttons = document.getElementsByClassName("radio button");
   //safety. this is the default.
@@ -80,16 +116,22 @@ function getFilePath() {
 
   for (let i = 0; i < buttons.length; i++) {
     if (!buttons[i].checked) continue;
+
     let dataName = buttons[i].id;
+    //browser data
     if (dataName === "browser") {
       filePath =
         "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/browser-ww-monthly-201910-202110.csv";
       break;
-    } else if (dataName === "os") {
+    }
+    //operating system data
+    else if (dataName === "os") {
       filePath =
         "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/os_combined-ww-monthly-201910-202110.csv";
       break;
-    } else if (dataName === "searchEngine") {
+    }
+    //search engine data. Kind of boring since google dominates
+    else if (dataName === "searchEngine") {
       filePath =
         "https://raw.githubusercontent.com/LoganPreston/CS765_DC2/main/search_engine-ww-monthly-201910-202110.csv";
       break;

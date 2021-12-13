@@ -14,7 +14,7 @@
         <button onclick="window.location.reload()" class="setup button">
           Reset
         </button>
-
+        <!--radio buttons for data selection. Default is Browser data-->
         <br />
         <input
           type="radio"
@@ -44,7 +44,7 @@
           onchange="genGraph('edgeSize')"
         />
         <label for="searchEngine">Search Engine Data</label><br />
-
+        <!--Generation buttons for preconfigured defaults-->
         <button
           id="tiny"
           class="setup button"
@@ -73,7 +73,7 @@
         >
           Generate Large Graph
         </button>
-
+        <!--slider for interaction and letting the user play around between 96 and 512. Starts at 512-->
         <input
           type="range"
           min="96"
@@ -83,13 +83,17 @@
           id="edgeSize"
           oninput="updateSliderVal('edgeSize','edgeSizeVal');genGraph('edgeSize');"
         />
-        <span id="edgeSizeVal"></span>
-        <p class="sliderLabel">Axis Size (px)</p>
+        <span id="edgeSizeVal">512</span>
+        <label for="edgeSizeVal" class="sliderLabel"
+          ><p>Axis Size (px)</p></label
+        >
       </nav>
     </div>
+    <!--SVG will be put in this div-->
     <div id="graph" class="graphClass"></div>
   </body>
   <footer>
+    <!--all scripts loaded at end-->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="public/js/core.js"></script>
     <script src="public/js/svg.js"></script>
