@@ -61,6 +61,13 @@ function runGenTinyGraph(dimension) {
 
     //add hover effects for interaction
     addHover(svg, hover, firstColHeader);
+    svg.selectAll("text").style("font-size", "10px");
+    svg
+      .selectAll("#xAxis text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.35em")
+      .attr("dy", ".35em")
+      .attr("transform", "rotate(-22.5)");
   });
 }
 
@@ -122,9 +129,9 @@ function runGenSmallGraph(dimension) {
     svg
       .selectAll("#xAxis text")
       .style("text-anchor", "end")
-      .attr("dx", "-.75em")
-      .attr("dy", ".07em")
-      .attr("transform", "rotate(-45)");
+      .attr("dx", "-.35em")
+      .attr("dy", ".35em")
+      .attr("transform", "rotate(-22.5)");
   });
 }
 
