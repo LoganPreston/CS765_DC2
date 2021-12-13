@@ -62,7 +62,7 @@ function genGraph(sliderId) {
   let size = Number(document.getElementById(sliderId).value);
   if (size > 375) {
     runGenLargeGraph(size);
-  } else if (size > 200) {
+  } else if (size > 215) {
     runGenMedGraph(size);
   } else if (size > 150) {
     runGenSmallGraph(size);

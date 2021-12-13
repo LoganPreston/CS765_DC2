@@ -11,7 +11,7 @@ function runGenTinyGraph(dimension) {
   d3.select("#hover").remove();
 
   // set the dimensions and margins of the graph
-  const margin = { top: 50, right: 250, bottom: 50, left: 250 },
+  const margin = { top: 50, right: 250, bottom: 100, left: 250 },
     width = dimension !== undefined ? dimension : 96,
     height = dimension !== undefined ? dimension : 96;
 
@@ -70,7 +70,7 @@ function runGenSmallGraph(dimension) {
   d3.select("#hover").remove();
 
   // set the dimensions and margins of the graph
-  const margin = { top: 50, right: 250, bottom: 50, left: 250 },
+  const margin = { top: 50, right: 250, bottom: 100, left: 250 },
     width = dimension !== undefined ? dimension : 170,
     height = dimension !== undefined ? dimension : 170;
 
@@ -134,7 +134,7 @@ function runGenMedGraph(dimension) {
   d3.select("#hover").remove();
 
   // set the dimensions and margins of the graph
-  const margin = { top: 50, right: 250, bottom: 50, left: 250 },
+  const margin = { top: 50, right: 250, bottom: 100, left: 250 },
     width = dimension !== undefined ? dimension : 256,
     height = dimension !== undefined ? dimension : 256;
 
@@ -199,10 +199,8 @@ function runGenLargeGraph(dimension) {
 
   // set the dimensions and margins of the graph
   const margin = { top: 50, right: 250, bottom: 100, left: 250 },
-    width =
-      dimension !== undefined ? dimension : 1000 - margin.left - margin.right,
-    height =
-      dimension !== undefined ? dimension : 600 - margin.top - margin.bottom;
+    width = dimension !== undefined ? dimension : 512, //used to be 1000 - margin.left - margin.right
+    height = dimension !== undefined ? dimension : 512; //used to be 600 - margin.top - margin.bottom
 
   // append the svg object to the body of the page
   const svg = setupSVG(margin, width, height);
